@@ -147,7 +147,6 @@ public class CartService implements ICartService {
     }
 
     /**
-     <<<<<<< HEAD
      * A method that recive a list of ProductCart fetch the products and create a list of CartProductsOutputDto.
      * @param cartProducts a list of objects of type ProductCart.
      * @return a list of CartProductsOutputDto.
@@ -230,6 +229,14 @@ public class CartService implements ICartService {
         return cartRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cart not found with this id"));
     }
 
+
+    /**
+     * Method that handles the request to fetch a list of carts in the database with the open status and that were created
+     * more than X days ago, then apply a discount to the total price
+     * @param discount a Double that determines the percentage value of the discount to be applied
+     * @param days a Integer that determines the age in days the cart returned need to have
+     * @return a list of objects of type DiscountedCartDto with a CartOutputDto the discount applied and the new price.
+     */
     public List<DiscountedCartDto> getDiscountedCartsByDate(Double discount, Integer days) {
         LocalDate cutDate = LocalDate.now().minusDays(days);
         List<Cart> openCarts = cartRepository.findByStatus(PurchaseOrderStatusEnum.OPEN);
@@ -241,6 +248,13 @@ public class CartService implements ICartService {
         return buildDiscountedCartDtoList(openCarts, discount);
     }
 
+    /**
+     * Method that handles the request to fetch a list of carts in the database with the open status and that
+     * have a specific product in them, then apply a discount to the total price
+     * @param discount a Double that determines the percentage value of the discount to be applied
+     * @param productId a Long that determines the product that the carts need to have
+     * @return a list of objects of type DiscountedCartDto with a CartOutputDto the discount applied and the new price.
+     */
     public List<DiscountedCartDto> getDiscountedCartsByProduct(Double discount, Long productId) {
         List<Cart> openCarts = cartRepository.findByStatus(PurchaseOrderStatusEnum.OPEN);
 
@@ -256,6 +270,12 @@ public class CartService implements ICartService {
         return buildDiscountedCartDtoList(openCarts, discount);
     }
 
+    /**
+     * A method that recive a list of Carts and builds a list of DiscountedCartDto.
+     * @param openCarts a list of objects of type ProductCart.
+     * @param discount a Double that determines the percentage value of the discount to be applied
+     * @return a list of DiscountedCartDto.
+     */
     private List<DiscountedCartDto> buildDiscountedCartDtoList(List<Cart> openCarts, Double discount) {
         List<DiscountedCartDto> cartDtoList = new ArrayList<>();
         for (Cart cart : openCarts){

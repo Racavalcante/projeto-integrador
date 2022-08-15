@@ -13,5 +13,11 @@ import java.util.List;
  * @version 0.0.1
  */
 public interface ICartRepository extends CrudRepository<Cart, Long> {
-    public List<Cart> findByStatus(PurchaseOrderStatusEnum status);
+
+    /**
+     * Method for to find a Cart by their status
+     * @param status PurchaseOrderStatusEnum
+     * @return an object of type Product filtered by status
+     */
+   List<Cart> findByStatus(PurchaseOrderStatusEnum status);
 }
