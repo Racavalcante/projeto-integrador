@@ -33,7 +33,7 @@ import java.util.List;
  * @see java.lang.Object
  */
 public class CartOutputDto {
-    private String customerName;
+    private String customerEmail;
     private PurchaseOrderStatusEnum status;
     private LocalDate date;
     private List<CartProductsOutputDto> products;
