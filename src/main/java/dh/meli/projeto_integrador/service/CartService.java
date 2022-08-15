@@ -2,11 +2,8 @@ package dh.meli.projeto_integrador.service;
 
 import dh.meli.projeto_integrador.dto.dtoInput.ProductDto;
 
-import dh.meli.projeto_integrador.dto.dtoOutput.CartOutputDto;
-import dh.meli.projeto_integrador.dto.dtoOutput.CartProductsOutputDto;
-import dh.meli.projeto_integrador.dto.dtoOutput.TotalPriceDto;
+import dh.meli.projeto_integrador.dto.dtoOutput.*;
 
-import dh.meli.projeto_integrador.dto.dtoOutput.UpdateStatusDto;
 import dh.meli.projeto_integrador.enumClass.PurchaseOrderStatusEnum;
 import dh.meli.projeto_integrador.dto.dtoInput.CartDto;
 import dh.meli.projeto_integrador.exception.ForbiddenException;
@@ -19,8 +16,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Class responsible for business rules and communication with the Cart Repository layer
@@ -91,13 +90,13 @@ public class CartService implements ICartService {
                     .orElseThrow(() -> new ResourceNotFoundException(String.format("Could not find valid product for id %d", product.getProductId())));
             Integer totalQuantity = batchRepository.findTotalQuantityByProductId(productById.getId());
 
-                if (totalQuantity == null || product.getQuantity() > totalQuantity) {
-                    listInvalidProducts.add(productById.getName());
-                }
+            if (totalQuantity == null || product.getQuantity() > totalQuantity) {
+                listInvalidProducts.add(productById.getName());
+            }
 
-                else if (product.getQuantity() <= totalQuantity) {
-                    listValidProducts.add(product);
-                }
+            else if (product.getQuantity() <= totalQuantity) {
+                listValidProducts.add(product);
+            }
         });
 
         if (listInvalidProducts.size() >= 1) {
@@ -148,7 +147,7 @@ public class CartService implements ICartService {
     }
 
     /**
-<<<<<<< HEAD
+     <<<<<<< HEAD
      * A method that recive a list of ProductCart fetch the products and create a list of CartProductsOutputDto.
      * @param cartProducts a list of objects of type ProductCart.
      * @return a list of CartProductsOutputDto.
@@ -198,7 +197,7 @@ public class CartService implements ICartService {
 
         Double total = calculateCartTotal(cartProductsDtos);
         return CartOutputDto.builder()
-                .customerName(customer.getName())
+                .customerEmail(customer.getEmailAddress())
                 .status(existCart.getStatus())
                 .date(existCart.getDate())
                 .products(cartProductsDtos)
@@ -230,4 +229,44 @@ public class CartService implements ICartService {
     private Cart findCartIfExists(Long id) {
         return cartRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cart not found with this id"));
     }
+
+    public List<DiscountedCartDto> getDiscountedCartsByDate(Double discount, Integer days) {
+        LocalDate cutDate = LocalDate.now().minusDays(days);
+        List<Cart> openCarts = cartRepository.findByStatus(PurchaseOrderStatusEnum.OPEN);
+
+        openCarts = openCarts.stream().filter((cart) -> cart.getDate().isBefore(cutDate)).collect(Collectors.toList());
+
+        if(openCarts.isEmpty()) throw new ResourceNotFoundException("there are no open carts with these parameters");
+
+        return buildDiscountedCartDtoList(openCarts, discount);
+    }
+
+    public List<DiscountedCartDto> getDiscountedCartsByProduct(Double discount, Long productId) {
+        List<Cart> openCarts = cartRepository.findByStatus(PurchaseOrderStatusEnum.OPEN);
+
+        openCarts = openCarts.stream().filter((cart) -> {
+           for(ProductCart productCart : cart.getProductCarts()){
+               if(productCart.getProduct().getId() == productId) return true;
+           }
+           return false;
+        }).collect(Collectors.toList());
+
+        if(openCarts.isEmpty()) throw new ResourceNotFoundException("there are no open carts with these parameters");
+
+        return buildDiscountedCartDtoList(openCarts, discount);
+    }
+
+    private List<DiscountedCartDto> buildDiscountedCartDtoList(List<Cart> openCarts, Double discount) {
+        List<DiscountedCartDto> cartDtoList = new ArrayList<>();
+        for (Cart cart : openCarts){
+            CartOutputDto cartDto = getCartById(cart.getId());
+            cartDtoList.add(DiscountedCartDto.builder()
+                    .cart(cartDto)
+                    .discount(String.format("%f%%", discount))
+                    .newPrice(cartDto.getTotal() * (1.0 - discount/100))
+                    .build());
+        }
+        return cartDtoList;
+    }
+
 }
