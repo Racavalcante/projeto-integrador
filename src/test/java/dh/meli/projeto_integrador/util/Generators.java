@@ -462,7 +462,7 @@ public class Generators {
     public static CartOutputDto validCartDto() {
         return CartOutputDto.builder()
                 .status(PurchaseOrderStatusEnum.OPEN)
-                .customerName("Alberto")
+                .customerEmail("Alberto@email.com")
                 .date(LocalDate.of(2022, 1, 13))
                 .products(validProductCartOutputDtoList())
                 .total(201.0)
