@@ -73,8 +73,8 @@ class CartControllerTest {
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.total",
                         CoreMatchers.is(Generators.validCartDto().getTotal())))
-                .andExpect(jsonPath("$.customerName",
-                        CoreMatchers.is(Generators.validCartDto().getCustomerName())));
+                .andExpect(jsonPath("$.customerEmail",
+                        CoreMatchers.is(Generators.validCartDto().getCustomerEmail())));
 
         verify(service, atLeastOnce()).getCartById(Generators.validCart1().getId());
     }
