@@ -190,7 +190,7 @@ class CartServiceTest {
          CartOutputDto cart = cartService.getCartById(id);
 
 
-        assertThat(cart.getCustomerName()).isEqualTo(Generators.validCustomer1().getName());
+        assertThat(cart.getCustomerEmail()).isEqualTo(Generators.validCustomer1().getEmailAddress());
         assertThat(cart.getStatus()).isEqualTo(Generators.validCart1().getStatus());
         assertThat(cart.getDate()).isEqualTo(Generators.validCart1().getDate());
         assertThat(cart.getProducts().size()).isEqualTo(2);
