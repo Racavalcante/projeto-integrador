@@ -19,6 +19,7 @@ import dh.meli.projeto_integrador.utils.*;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -76,17 +80,17 @@ public class CartIntegrationTest {
         ProductCart productCart1 = Generators.validProductCart1();
         ProductCart productCart2 = Generators.validProductCart2();
 
-        Customer savedCustomer = customerRepository.save(customer);
+        customerRepository.save(customer);
         Cart savedCart = cartRepository.save(cart);
-        Iterable<Cart> allcarts = cartRepository.findAll();
+        cartRepository.findAll();
         Product savedproduct1 = productRepository.save(product1);
         Product savedproduct2 =productRepository.save(product2);
         productCart1.setCart(savedCart);
         productCart2.setCart(savedCart);
         productCart1.setProduct(savedproduct1);
         productCart2.setProduct(savedproduct2);
-        ProductCart savedProductCart1 = productCartRepository.save(productCart1);
-        ProductCart savedProductCart2 = productCartRepository.save(productCart2);
+        productCartRepository.save(productCart1);
+        productCartRepository.save(productCart2);
 
         ResultActions response = mockMvc.perform(
                 get("/api/v1/fresh-products/orders/{id}", savedCart.getId())
@@ -154,6 +158,128 @@ public class CartIntegrationTest {
                         CoreMatchers.is(updateStatusDto.getMessage())));
     }
 
+    @Test
+    void getDiscountedCartsByDate_returnDiscountedCartDtoList_whenSuccess() throws Exception {
+        Cart cart = Generators.validCartWhitoutProductCart();
+        Customer customer = Generators.validCustomer1();
+        Product product1 = Generators.validProduct1();
+        Product product2 = Generators.validProduct2();
+        ProductCart productCart1 = Generators.validProductCart1();
+        ProductCart productCart2 = Generators.validProductCart2();
+
+        customerRepository.save(customer);
+        Cart savedCart = cartRepository.save(cart);
+        cartRepository.findAll();
+        Product savedproduct1 = productRepository.save(product1);
+        Product savedproduct2 =productRepository.save(product2);
+        productCart1.setCart(savedCart);
+        productCart2.setCart(savedCart);
+        productCart1.setProduct(savedproduct1);
+        productCart2.setProduct(savedproduct2);
+        productCartRepository.save(productCart1);
+        productCartRepository.save(productCart2);
+
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products/orders/discounted/{discount}/bydate/{days}",
+                discount, productId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()",
+                        CoreMatchers.is(Generators.validDiscountedCartDto().size())))
+                .andExpect(jsonPath("$[0].cart.customerEmail",
+                        CoreMatchers.is(Generators.validCustomer1().getEmailAddress())))
+                .andExpect(jsonPath("$[0].discount",
+                        CoreMatchers.is(String.format("%f%%", discount))))
+                .andExpect(jsonPath("$[0].newPrice",
+                        CoreMatchers.is(Generators.validCartDto().getTotal()  * (1.0 - discount/100))));
+
+
+    }
+
+    @Test
+    void getDiscountedCartsByProduct_returnDiscountedCartDtoList_whenSuccess() throws Exception {
+        Cart cart = Generators.validCartWhitoutProductCart();
+        Customer customer = Generators.validCustomer1();
+        Product product1 = Generators.validProduct1();
+        Product product2 = Generators.validProduct2();
+        ProductCart productCart1 = Generators.validProductCart1();
+        ProductCart productCart2 = Generators.validProductCart2();
+
+        customerRepository.save(customer);
+        Cart savedCart = cartRepository.save(cart);
+        cartRepository.findAll();
+        Product savedproduct1 = productRepository.save(product1);
+        Product savedproduct2 =productRepository.save(product2);
+        productCart1.setCart(savedCart);
+        productCart2.setCart(savedCart);
+        productCart1.setProduct(savedproduct1);
+        productCart2.setProduct(savedproduct2);
+        productCartRepository.save(productCart1);
+        productCartRepository.save(productCart2);
+
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products/orders/discounted/{discount}/byproduct/{productId}",
+                discount,productId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()",
+                        CoreMatchers.is(Generators.validDiscountedCartDto().size())))
+                .andExpect(jsonPath("$[0].cart.customerEmail",
+                        CoreMatchers.is(Generators.validCustomer1().getEmailAddress())))
+                .andExpect(jsonPath("$[0].discount",
+                        CoreMatchers.is(String.format("%f%%", discount))))
+                .andExpect(jsonPath("$[0].newPrice",
+                        CoreMatchers.is(Generators.validCartDto().getTotal()  * (1.0 - discount/100))));
+
+
+    }
+
+    @Test
+    void getDiscountedCartsByDate_throwsResourceNotFoundException_whenThereAreNoCarts() throws Exception {
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products/orders/discounted/{discount}/bydate/{days}",
+                discount, productId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message",
+                        CoreMatchers.is(String.format("there are no open carts with these parameters"))))
+                .andExpect(jsonPath("$.status",
+                        CoreMatchers.is(404)))
+                .andExpect(jsonPath("$.title",
+                        CoreMatchers.is("Resource Not Found")));
+
+
+    }
+
+    @Test
+    void getDiscountedCartsByProduct_throwsResourceNotFoundException_whenThereAreNoCarts() throws Exception {
+
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products/orders/discounted/{discount}/byproduct/{productId}",
+                discount,productId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message",
+                        CoreMatchers.is(String.format("there are no open carts with these parameters"))))
+                .andExpect(jsonPath("$.status",
+                        CoreMatchers.is(404)))
+                .andExpect(jsonPath("$.title",
+                        CoreMatchers.is("Resource Not Found")));
+
+
+    }
 }
 
 
