@@ -4,8 +4,10 @@ import dh.meli.projeto_integrador.dto.dtoInput.CartDto;
 
 import dh.meli.projeto_integrador.dto.dtoInput.ProductDto;
 import dh.meli.projeto_integrador.dto.dtoOutput.CartOutputDto;
+import dh.meli.projeto_integrador.dto.dtoOutput.DiscountedCartDto;
 import dh.meli.projeto_integrador.dto.dtoOutput.UpdateStatusDto;
 
+import dh.meli.projeto_integrador.enumClass.PurchaseOrderStatusEnum;
 import dh.meli.projeto_integrador.exception.ResourceNotFoundException;
 import dh.meli.projeto_integrador.model.Cart;
 import dh.meli.projeto_integrador.model.Customer;
@@ -37,6 +39,7 @@ import org.mockito.quality.Strictness;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -208,5 +211,123 @@ class CartServiceTest {
         verify(customerRepository, atLeastOnce()).findById(id);
         verify(productRepository, atLeastOnce()).findById(1L);
         verify(productRepository, atLeastOnce()).findById(2L);
+    }
+
+    @Test
+    void getDiscountedCartsByDate_WhenThereAreCarts_ReturnADiscountedCartDtoList(){
+        BDDMockito.when(cartRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCart1()));
+
+        BDDMockito.when(customerRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCustomer1()));
+
+        BDDMockito.when(productRepository.findById(1L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct1()));
+
+        BDDMockito.when(productRepository.findById(2L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct2()));
+
+        BDDMockito.when(cartRepository.findByStatus(any(PurchaseOrderStatusEnum.class)))
+                .thenReturn(List.of(Generators.validCart1()));
+
+        Double discount = 10.0;
+        Integer days = 2;
+
+        List<DiscountedCartDto> discountedCart = cartService.getDiscountedCartsByDate(discount, days);
+
+        assertThat(discountedCart.size()).isEqualTo(1);
+        assertThat(discountedCart.get(0).getDiscount()).isEqualTo(String.format("%f%%", discount));
+        assertThat(discountedCart.get(0).getNewPrice()).isEqualTo(Generators.validCartDto().getTotal() * (1.0 - discount/100));
+
+        verify(cartRepository, atLeastOnce()).findByStatus(any(PurchaseOrderStatusEnum.class));
+    }
+
+
+
+    @Test
+    void getDiscountedCartsByProduct_WhenThereAreCarts_ReturnADiscountedCartDtoList() {
+        BDDMockito.when(cartRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCart1()));
+
+        BDDMockito.when(customerRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCustomer1()));
+
+        BDDMockito.when(productRepository.findById(1L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct1()));
+
+        BDDMockito.when(productRepository.findById(2L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct2()));
+
+        BDDMockito.when(cartRepository.findByStatus(any(PurchaseOrderStatusEnum.class)))
+                .thenReturn(List.of(Generators.validCart1()));
+
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        List<DiscountedCartDto> discountedCart = cartService.getDiscountedCartsByProduct(discount, productId);
+
+        assertThat(discountedCart.size()).isEqualTo(1);
+        assertThat(discountedCart.get(0).getDiscount()).isEqualTo(String.format("%f%%", discount));
+        assertThat(discountedCart.get(0).getNewPrice()).isEqualTo(Generators.validCartDto().getTotal() * (1.0 - discount/100));
+
+        verify(cartRepository, atLeastOnce()).findByStatus(any(PurchaseOrderStatusEnum.class));
+    }
+
+    @Test
+    void getDiscountedCartsByProduct_WhenThereAreNoCarts_ThrowsAnResourceNotFoundException() {
+        BDDMockito.when(cartRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCart1()));
+
+        BDDMockito.when(customerRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCustomer1()));
+
+        BDDMockito.when(productRepository.findById(1L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct1()));
+
+        BDDMockito.when(productRepository.findById(2L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct2()));
+
+        BDDMockito.when(cartRepository.findByStatus(any(PurchaseOrderStatusEnum.class)))
+                .thenReturn(List.of());
+
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            cartService.getDiscountedCartsByProduct(discount, productId);
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("there are no open carts with these parameters");
+
+        verify(cartRepository, atLeastOnce()).findByStatus(any(PurchaseOrderStatusEnum.class));
+    }
+
+    @Test
+    void getDiscountedCartsByDate_WhenThereAreNoCarts_ThrowsAnResourceNotFoundException(){
+        BDDMockito.when(cartRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCart1()));
+
+        BDDMockito.when(customerRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(Generators.validCustomer1()));
+
+        BDDMockito.when(productRepository.findById(1L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct1()));
+
+        BDDMockito.when(productRepository.findById(2L))
+                .thenReturn(Optional.ofNullable(Generators.validProduct2()));
+
+        BDDMockito.when(cartRepository.findByStatus(any(PurchaseOrderStatusEnum.class)))
+                .thenReturn(List.of());
+
+        Double discount = 10.0;
+        Integer days = 2;
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            cartService.getDiscountedCartsByDate(discount, days);
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("there are no open carts with these parameters");
+
+        verify(cartRepository, atLeastOnce()).findByStatus(any(PurchaseOrderStatusEnum.class));
     }
 }
