@@ -40,7 +40,8 @@ ___
 - RO-03 Verificar a localização de um produto no armazém;
 - RO-04 Consultar o estoque de um produto em todos os armazéns;
 - RO-05 Consultar a data de validade por lote
-- RO-06 Testes de unidade & testes de integração de todos os requisitos anteriores.
+_ RO-06 Buscar carrinhos abertos e desconta-los 
+- RO-07 Testes de unidade & testes de integração de todos os requisitos anteriores.
 
 </p>
 <p> Cobertura de testes Unitários (TU) implementados (%)</p>
