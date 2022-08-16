@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1fa69900-e746-4d41-b2b6-6b11c6fc374d",
+		"_postman_id": "de0407ba-375d-4d27-8b73-ce589d9188ae",
 		"name": "Projeto Integrador - Mercado Frescos",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -323,7 +323,7 @@
 			]
 		},
 		{
-			"name": "Endpoint - Requirement 4",
+			"name": "Endpoints - Requirement 4",
 			"item": [
 				{
 					"name": "Get Products Total Quantity By Warehouse",
@@ -401,6 +401,63 @@
 								"1",
 								"category",
 								"FS"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Endpoints - Requirement 6",
+			"item": [
+				{
+					"name": "Get discounted carts by date",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/fresh-products/orders/discounted/10/bydate/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"fresh-products",
+								"orders",
+								"discounted",
+								"10",
+								"bydate",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get discounted carts by product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/fresh-products/orders/discounted/10/byproduct/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"fresh-products",
+								"orders",
+								"discounted",
+								"10",
+								"byproduct",
+								"3"
 							]
 						}
 					},
