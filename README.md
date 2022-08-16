@@ -53,7 +53,7 @@ _ RO-06 Buscar carrinhos abertos e desconta-los
 - TU-04 ProductController (100% methods, 100% lines);
 - TU-05 AgentService (100% methods, 100% lines);
 - TU-06 BatchService (80% methods, 86% lines);
-- TU-07 CartService (100% methods, 100% lines);
+- TU-07 CartService (100% methods, 99% lines);
 - TU-08 OrderService (100% methods, 92% lines);
 - TU-09 ProductService (87% methods, 90% lines);
 - TU-10 SectionService (100% methods, 75% lines);
