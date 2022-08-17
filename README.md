@@ -27,6 +27,18 @@ Neste sentido, o programa viabiliza o cadastro, consulta e edição de lotes de 
 
 ___
 
+<a name="Objetivo"></a>
+## 🖊 requisito 6
+
+
+<p> 
+O objetivo deste requisito é posibilitar um representante a aplicar descontos promocionais a carrinhos abertos considerados abandonados ou com certos produtos, para tal foram disponibilizadas duas rotas na api onde se iinforma o desconto dejesado sobre os carrinhos, e ha quantos dias o carrinho precisa ter sido criado, no caso da busca ser por data, ou o id do produto que se deseja estar presente nos carrinhos.
+Uma lista com os carrinhos encontrados e seus preços alterados é retornada.2
+</p>
+
+___
+
+
 <a name="Requisitos"></a>
 
 ## 📄 Requisitos
@@ -40,7 +52,8 @@ ___
 - RO-03 Verificar a localização de um produto no armazém;
 - RO-04 Consultar o estoque de um produto em todos os armazéns;
 - RO-05 Consultar a data de validade por lote
-- RO-06 Testes de unidade & testes de integração de todos os requisitos anteriores.
+- RO-06 aplicar descontos a carrinhos abertos
+- RO-07 Testes de unidade & testes de integração de todos os requisitos anteriores.
 
 </p>
 <p> Cobertura de testes Unitários (TU) implementados (%)</p>
@@ -52,7 +65,7 @@ ___
 - TU-04 ProductController (100% methods, 100% lines);
 - TU-05 AgentService (100% methods, 100% lines);
 - TU-06 BatchService (80% methods, 86% lines);
-- TU-07 CartService (100% methods, 100% lines);
+- TU-07 CartService (100% methods, 99% lines);
 - TU-08 OrderService (100% methods, 92% lines);
 - TU-09 ProductService (87% methods, 90% lines);
 - TU-10 SectionService (100% methods, 75% lines);
