@@ -2,6 +2,7 @@ package dh.meli.projeto_integrador.controller;
 
 import dh.meli.projeto_integrador.dto.dtoInput.CartDto;
 import dh.meli.projeto_integrador.dto.dtoOutput.CartOutputDto;
+import dh.meli.projeto_integrador.dto.dtoOutput.DiscountedCartDto;
 import dh.meli.projeto_integrador.dto.dtoOutput.TotalPriceDto;
 
 
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 /**
@@ -66,20 +68,30 @@ public class CartController {
         UpdateStatusDto result = cartService.updateStatusCart(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     * A get method that when called will return in the body request a list of carts with the status open and
+     * and date older than an specified number of days and will apply a specified discount to their price
+     * @param discount a Double received by the URL request to determine the percentage value of the discount to be applied
+     * @param days a Integer received by the URL request to determine the age in days the cart returned need to have
+     * @return Response Entity of a a list of objects of type DiscountedCartDto with a CartOutputDto the discount
+     * applied and the new price and the corresponding HttpStatus.
+     */
+    @GetMapping("/orders/discounted/{discount}/bydate/{days}")
+    public ResponseEntity<List<DiscountedCartDto>> getDiscountedCartsByDate(@PathVariable Double discount, @PathVariable Integer days) {
+        return ResponseEntity.ok(cartService.getDiscountedCartsByDate(discount, days));
+    }
+
+    /**
+     * A get method that when called will return in the body request a list of carts with the status open and
+     * and contain an specific product will apply a specified discount to their price
+     * @param discount a Double received by the URL request to determine the percentage value of the discount to be applied
+     * @param productId a Long received by the URL request to determine the product that the carts need to have
+     * @return Response Entity of a a list of objects of type DiscountedCartDto with a CartOutputDto the discount
+     * applied and the new price and the corresponding HttpStatus.
+     */
+    @GetMapping("/orders/discounted/{discount}/byproduct/{productId}")
+    public ResponseEntity<List<DiscountedCartDto>> getDiscountedCartsByProduct(@PathVariable Double discount, @PathVariable Long productId) {
+        return ResponseEntity.ok(cartService.getDiscountedCartsByProduct(discount, productId));
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

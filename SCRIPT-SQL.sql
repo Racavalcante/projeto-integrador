@@ -47,18 +47,18 @@ INSERT INTO batch VALUES (NULL, 30, 17.0, "2022-09-30", 30, "2022-07-15", "12:06
                          (NULL, 15, 1.0, "2023-01-15", 89, "2022-07-15", "14:39:40", 5.0, 5, 6);
 
 INSERT INTO cart VALUES (NULL, "2022-08-08", "OPEN", 1),
-                        (NULL, "2022-08-08", "OPEN", 1),
-                        (NULL, "2022-08-08", "OPEN", 1),
-                        (NULL, "2022-08-08", "OPEN", 1),
+                        (NULL, "2022-08-17", "OPEN", 1),
+                        (NULL, "2022-08-17", "OPEN", 1),
+                        (NULL, "2022-08-08", "FINISHED", 1),
                         (NULL, "2022-08-08", "OPEN", 1);
 
 INSERT INTO product_cart VALUES (NULL, 2, 1, 1),
-                         (NULL, 3, 1, 3),
-                         (NULL, 1, 2, 5),
+                         (NULL, 5, 1, 3),
+                         (NULL, 2, 2, 5),
                          (NULL, 5, 2, 7),
                          (NULL, 2, 3, 9),
                          (NULL, 3, 3, 2),
                          (NULL, 4, 4, 4),
                          (NULL, 1, 4, 6),
-                         (NULL, 1, 5, 8),
+                         (NULL, 5, 5, 8),
                          (NULL, 2, 5, 1);

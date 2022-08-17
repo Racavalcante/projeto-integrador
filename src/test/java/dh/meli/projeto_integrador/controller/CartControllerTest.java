@@ -36,10 +36,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,14 +67,14 @@ class CartControllerTest {
         BDDMockito.when(service.getCartById(anyLong()))
                 .thenReturn(Generators.validCartDto());
 
-        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products//orders/{id}", Generators.validCart1().getId())
+        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products/orders/{id}", Generators.validCart1().getId())
                 .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.total",
                         CoreMatchers.is(Generators.validCartDto().getTotal())))
-                .andExpect(jsonPath("$.customerName",
-                        CoreMatchers.is(Generators.validCartDto().getCustomerName())));
+                .andExpect(jsonPath("$.customerEmail",
+                        CoreMatchers.is(Generators.validCartDto().getCustomerEmail())));
 
         verify(service, atLeastOnce()).getCartById(Generators.validCart1().getId());
     }
@@ -122,6 +122,50 @@ class CartControllerTest {
         assertThat(response.getBody().getMessage()).isEqualTo("Cart Finished successfully");
 
         verify(cartService, atLeastOnce()).updateStatusCart(cart.getId());
+    }
+
+    @Test
+    void getDiscountedCartsByDate_returnDiscountedCartDtoList_whenSuccess() throws Exception {
+
+        BDDMockito.when(service.getDiscountedCartsByDate(anyDouble(), anyInt()))
+                .thenReturn(Generators.validDiscountedCartDto());
+
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products/orders/discounted/{discount}/bydate/{days}",
+                discount, productId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()",
+                        CoreMatchers.is(Generators.validDiscountedCartDto().size())))
+                .andExpect(jsonPath("$[0].cart.customerEmail",
+                        CoreMatchers.is(Generators.validCustomer1().getEmailAddress())));
+
+        verify(service, atLeastOnce()).getDiscountedCartsByDate(10.0, 2);
+    }
+
+    @Test
+    void getDiscountedCartsByProduct_returnDiscountedCartDtoList_whenSuccess() throws Exception {
+
+        BDDMockito.when(service.getDiscountedCartsByProduct(anyDouble(),anyLong()))
+                .thenReturn(Generators.validDiscountedCartDto());
+
+        Double discount = 10.0;
+        Long productId = 2L;
+
+        ResultActions response = mockMvc.perform(get("/api/v1/fresh-products/orders/discounted/{discount}/byproduct/{productId}",
+                discount,productId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()",
+                        CoreMatchers.is(Generators.validDiscountedCartDto().size())))
+                .andExpect(jsonPath("$[0].cart.customerEmail",
+                        CoreMatchers.is(Generators.validCustomer1().getEmailAddress())));
+
+        verify(service, atLeastOnce()).getDiscountedCartsByProduct(10.0,2L);
     }
 
 }

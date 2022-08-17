@@ -415,7 +415,6 @@ public class Generators {
 
     public static Cart validCart1() {
         return Cart.builder()
-                .id(1L)
                 .date(LocalDate.of(2022, 1, 13))
                 .status(PurchaseOrderStatusEnum.OPEN)
                 .customer(validCustomer1())
@@ -426,7 +425,7 @@ public class Generators {
     public static Cart validCartWhitoutProductCart() {
         return Cart.builder()
                 .id(1L)
-                .date(LocalDate.of(2022, 1, 13))
+                .date(LocalDate.now().minusDays(3))
                 .status(PurchaseOrderStatusEnum.OPEN)
                 .customer(validCustomer1())
                 .build();
@@ -462,12 +461,21 @@ public class Generators {
     public static CartOutputDto validCartDto() {
         return CartOutputDto.builder()
                 .status(PurchaseOrderStatusEnum.OPEN)
-                .customerName("Alberto")
-                .date(LocalDate.of(2022, 1, 13))
+                .customerEmail("Alberto@email.com")
+                .date(LocalDate.of(2022, 8, 10))
                 .products(validProductCartOutputDtoList())
                 .total(201.0)
                 .build();
+    }
 
+    public static List<DiscountedCartDto> validDiscountedCartDto() {
+        List<DiscountedCartDto> discountedCartList = new ArrayList<>();
+        discountedCartList.add(DiscountedCartDto.builder()
+                .cart(validCartDto())
+                .discount("10%")
+                .newPrice(181.2)
+                .build());
+        return discountedCartList;
     }
 
     public static ListProductByWarehouseDto getListProductByWarehouseDto() {
